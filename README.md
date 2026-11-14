@@ -60,7 +60,7 @@ Scene length is the longest of the voice line, the clip and `minSeconds`. Clips 
 
 pnpm and ffmpeg. The skill finds Chrome/Chromium and adb on its own; override with `CHROMIUM_PATH`, `ADB` or `ANDROID_HOME`. `psql` is needed only if a prep step uses `sql()`. You start the dev servers and emulator yourself. The agent lists what needs to be running.
 
-See [`examples/scheduled-deliveries`](skills/feature-video/examples/scheduled-deliveries) for a full tier L video covering web, Android and demo data.
+See [`examples/scheduled-invoices`](skills/feature-video/examples/scheduled-invoices) for a full tier L video covering web, Android and demo data.
 
 ## Other skills
 

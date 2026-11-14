@@ -9,80 +9,77 @@ import { script } from "./script.ts";
 import voice from "./voice.json" with { type: "json" };
 
 const visuals: Visuals = {
-  intro: () => <TitleScene eyebrow="New feature" title="Scheduled deliveries" lead="Book now. Pick up later. Riders show up on time." />,
+  intro: () => <TitleScene eyebrow="New feature" title="Scheduled invoices" lead="Write it now. Send it when it's due." />,
   what: () => (
     <StatementScene
       eyebrow="What's new"
-      title="Pick a pickup time, not just ASAP"
+      title="Pick a send date, not just Send now"
       chips={[
-        { text: "30 min → 48 h ahead" },
-        { text: "Shown in IST, stored in UTC", tone: "muted" },
-        { text: "Price locked at booking", tone: "ok" },
+        { text: "Up to 90 days ahead" },
+        { text: "Sent in the customer's timezone", tone: "muted" },
+        { text: "Totals locked at scheduling", tone: "ok" },
       ]}
     />
   ),
-  book: (p) => <BrowserScene {...p} url="store.logiskit.app/jobs/new" label="Store dashboard" />,
-  release: () => <ReleaseTimeline />,
-  manage: (p) => <BrowserScene {...p} url="store.logiskit.app/scheduled" label="Store dashboard" />,
-  admin: (p) => <BrowserScene {...p} url="admin.logiskit.app/dashboard/jobs" label="Admin" />,
-  rider: (p) => (
+  schedule: (p) => <BrowserScene {...p} url="app.acme.dev/invoices/new" label="Invoice editor" />,
+  send: () => <SendTimeline />,
+  manage: (p) => <BrowserScene {...p} url="app.acme.dev/invoices/scheduled" label="Invoices" />,
+  admin: (p) => <BrowserScene {...p} url="admin.acme.dev/invoices" label="Support admin" />,
+  mobile: (p) => (
     <PhoneScene
       {...p}
-      eyebrow="Rider app"
-      title="Riders know when to arrive"
-      points={["Pickup time on every offer", "Shown again on the way to pickup", "Same flow as ASAP jobs"]}
+      eyebrow="Mobile app"
+      title="See when it went out"
+      points={["Sent status on every invoice", "Delivery log per email", "PDF exactly as sent"]}
     />
   ),
-  flag: () => <UnassignedFlag />,
+  flag: () => <BounceFlag />,
   api: () => (
     <CodeScene
-      eyebrow="Merchant API"
-      title="Two optional fields on the quote"
+      eyebrow="API"
+      title="One optional field on create"
       blocks={[
         {
           label: "POST",
-          title: "/v1/job-quotes",
-          highlight: ["scheduledPickupAt", "riderSearchLeadMinutes"],
+          title: "/v1/invoices",
+          highlight: ["sendAt"],
           code: `{
-  "pickupAddress": "12 MG Road, Bengaluru",
-  "pickupLatitude": 12.9716,
-  "pickupLongitude": 77.5946,
-  "dropAddress": "4th Block, Koramangala",
-  "dropLatitude": 12.9352,
-  "dropLongitude": 77.6245,
-  "scheduledPickupAt": "2026-11-06T16:30:00+05:30",
-  "riderSearchLeadMinutes": 20
+  "customerId": "cus_8Hq2LmZr",
+  "currency": "usd",
+  "items": [
+    { "description": "Brand refresh, phase 2", "amount": 480000 }
+  ],
+  "sendAt": "2026-12-01T09:00:00-05:00"
 }`,
         },
         {
           label: "201",
-          title: "POST /v1/jobs",
-          highlight: ['"scheduled"', "releaseAt", "scheduledPickupAt"],
+          title: "POST /v1/invoices",
+          highlight: ['"scheduled"', "sendAt", "totalMinor"],
           code: `{
-  "id": "6f1c2a9e-4b7d-4e0a-9c3f-2d8e5b1a7c40",
-  "externalOrderId": "ORD-10482",
+  "id": "inv_3kT9wPq1",
+  "number": "NW-0142",
   "status": "scheduled",
-  "chargeMinor": 5400,
-  "settlement": "reserved",
-  "scheduledPickupAt": "2026-11-06T11:00:00.000Z",
-  "releaseAt": "2026-11-06T10:40:00.000Z"
+  "totalMinor": 480000,
+  "sendAt": "2026-12-01T14:00:00.000Z",
+  "checkAt": "2026-12-01T13:00:00.000Z"
 }`,
         },
       ]}
     />
   ),
-  outro: () => <OutroScene title="Live now" lead="Store dashboard, admin, rider app and the merchant API." links={["store.logiskit.app/scheduled", "docs.logiskit.app"]} />,
+  outro: () => <OutroScene title="Live now" lead="Web app, support admin, mobile app and the API." links={["app.acme.dev/invoices/scheduled", "docs.acme.dev"]} />,
 };
 
 export const film = defineFilm({ script, voice, clips, visuals });
 
 const STEPS = [
-  { at: 0, time: "2:05 PM", label: "Booked", status: "scheduled", tone: color.accent, note: "price + credit locked" },
-  { at: 0.66, time: "4:10 PM", label: "Rider search starts", status: "queued", tone: color.warn, note: "pickup − 20 min (10–30)" },
-  { at: 1, time: "4:30 PM", label: "Pickup", status: "pickup_completed", tone: color.ok, note: "rider at the store" },
+  { at: 0, time: "Nov 24", label: "Scheduled", status: "scheduled", tone: color.accent, note: "totals + tax locked" },
+  { at: 0.66, time: "Dec 1, 8:00 AM", label: "Email check", status: "checking", tone: color.warn, note: "send time − 1 h" },
+  { at: 1, time: "Dec 1, 9:00 AM", label: "Sent", status: "sent", tone: color.ok, note: "customer's timezone" },
 ];
 
-function ReleaseTimeline() {
+function SendTimeline() {
   const frame = useCurrentFrame();
   const sweep = progress(frame, 16, 110);
   const left = 200;
@@ -90,7 +87,7 @@ function ReleaseTimeline() {
   return (
     <AbsoluteFill style={{ padding: "150px 200px 0" }}>
       <Eyebrow>How it runs</Eyebrow>
-      <Heading size={76}>Held as Scheduled, then released</Heading>
+      <Heading size={76}>Held as Scheduled, then sent</Heading>
       <div style={{ position: "absolute", left, top: 560, width, height: 4, borderRadius: 4, background: color.line }}>
         <div style={{ width: `${sweep * 100}%`, height: "100%", borderRadius: 4, background: `linear-gradient(90deg, ${color.accent}, ${color.warn} 66%, ${color.ok})` }} />
       </div>
@@ -117,28 +114,28 @@ function ReleaseTimeline() {
   );
 }
 
-function UnassignedFlag() {
+function BounceFlag() {
   const frame = useCurrentFrame();
   const rows = [
-    { kind: "Scheduled", rule: "no rider at pickup time", tone: color.accent },
-    { kind: "ASAP", rule: "no rider 15 min after publish", tone: color.muted },
+    { kind: "Scheduled", rule: "email bounces at send time", tone: color.accent },
+    { kind: "Send now", rule: "email bounces within 15 min", tone: color.muted },
   ];
   return (
     <AbsoluteFill style={{ justifyContent: "center", padding: "0 200px 60px" }}>
       <Eyebrow>Safety net</Eyebrow>
-      <Heading size={80}>Unclaimed jobs get flagged</Heading>
+      <Heading size={80}>Bounced invoices get flagged</Heading>
       <div style={{ marginTop: 50, display: "grid", gap: 18, maxWidth: 1240 }}>
         {rows.map((row, i) => (
           <div key={row.kind} style={{ display: "flex", alignItems: "center", gap: 28, padding: "22px 30px", borderRadius: 16, background: color.panel, border: `1px solid ${color.line}`, ...rise(frame, 20 + i * 10, 18) }}>
             <span style={{ width: 170, fontSize: 30, fontWeight: 650, color: row.tone }}>{row.kind}</span>
             <span style={{ flex: 1, fontSize: 30, color: color.muted }}>{row.rule}</span>
             <Chip tone="warn" at={34 + i * 10}>
-              at_risk
+              needs_follow_up
             </Chip>
           </div>
         ))}
       </div>
-      <p style={{ marginTop: 30, fontSize: 24, color: color.faint, ...rise(frame, 50, 10) }}>Flagged once, logged on the job timeline. No rider penalty.</p>
+      <p style={{ marginTop: 30, fontSize: 24, color: color.faint, ...rise(frame, 50, 10) }}>Flagged once, logged on the invoice timeline.</p>
     </AbsoluteFill>
   );
 }

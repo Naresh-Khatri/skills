@@ -13,8 +13,6 @@ const require = createRequire(import.meta.url);
 const sherpa = require("sherpa-onnx-node");
 
 const MODELS = process.env.TTS_MODELS ?? join(homedir(), ".local/share/feature-video/tts");
-// piper voices other local tools already downloaded; reused, never written to
-const SHARED_PIPER = join(homedir(), ".local/share/unottr/models/tts");
 const RELEASES = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models";
 const KOKORO = "kokoro-multi-lang-v1_0";
 const GAP = 0.32;
@@ -73,9 +71,7 @@ function engine(voice: string) {
       },
     };
   }
-  const dir =
-    [join(MODELS, voice), join(SHARED_PIPER, voice)].find((d) => existsSync(join(d, `${voice}.onnx`))) ??
-    ensureModel(`vits-piper-${voice}`, voice);
+  const dir = existsSync(join(MODELS, voice, `${voice}.onnx`)) ? join(MODELS, voice) : ensureModel(`vits-piper-${voice}`, voice);
   return {
     sid: 0,
     model: { vits: { model: join(dir, `${voice}.onnx`), tokens: join(dir, "tokens.txt"), dataDir: join(dir, "espeak-ng-data") } },

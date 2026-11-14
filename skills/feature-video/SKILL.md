@@ -9,16 +9,18 @@ Audience is a tech-savvy team that cares about **what changed**. No marketing fl
 
 ## 0. Scaffold (every run)
 
+`<skill>` = the folder holding this SKILL.md (wherever the agent installed it).
+
 ```bash
-~/.claude/skills/feature-video/scripts/init.sh            # creates if missing, else no-op + version check
-~/.claude/skills/feature-video/scripts/init.sh --update   # skill kit newer than .kit-version -> refresh kit files
+<skill>/scripts/init.sh            # creates if missing, else no-op + version check
+<skill>/scripts/init.sh --update   # skill kit newer than .kit-version -> refresh kit files
 ```
 
 - Lives in `<repo>/feature-video/`, renders in `feature-video/out/`. init adds `/feature-video/` to
   `.git/info/exclude` (local, never a tracked `.gitignore`). Never commit or `git add` anything in it.
 - Kit-owned (overwritten by `--update`): `src/kit`, `scripts`, `src/Root.tsx`, `src/index.ts`, configs, `README.md`.
   Project-owned: `src/project.ts`, `NOTES.md`, `src/features/*`, `public/`. Improve the kit in
-  `~/.claude/skills/feature-video/template/` (bump `VERSION`), not in a project copy.
+  `<skill>/template/` (bump `VERSION`), not in a project copy.
 - **First run in a project** (fresh scaffold): fill `src/project.ts` from the repo (product name, logo → copy an
   svg/png into `public/brand/`, accent hex from the tailwind/theme tokens, locale + timezone the product uses).
   Then fill `NOTES.md` by reading the repo: how to start db/api/web/mobile, demo logins, seeded data. Ask the
@@ -82,7 +84,7 @@ Fresh session per video; read `NOTES.md` instead of rediscovering the repo.
    but sound robotic; use only if asked. `TTS_SPEED` overrides 1.05.
 4. Demo data: `prep.ts` steps (`pnpm prep <id> <step>`, helpers `sql`, `run`, plain `fetch`) that make on-camera data look real and are
    re-runnable (setup / release / undo). Use realistic names/addresses for the product's market.
-5. Record: `record-web.ts` / `record-android.ts` flows (see `examples/scheduled-deliveries/`).
+5. Record: `record-web.ts` / `record-android.ts` flows (see `<skill>/examples/scheduled-invoices/`).
 6. `Film.tsx`: map scene ids → `TitleScene`, `StatementScene`, `BrowserScene`, `PhoneScene`, `CodeScene`,
    `OutroScene` (`src/kit/scenes.tsx`), or a small custom scene (e.g. a timeline). Export
    `film = defineFilm({...})`; registration is automatic. API scenes may be made up but must match the real
@@ -110,7 +112,7 @@ Fresh session per video; read `NOTES.md` instead of rediscovering the repo.
 - Dev DB behind on migrations → feature inserts fail. Check migration status first.
 - `psql -At` prints `UPDATE n` without `-q` (prep `sql()` already passes `-q`).
 - Native `datetime-local` `step` counts from `min` — unaligned `min` rejects round times.
-- Leftover state from earlier takes (accepted jobs, busy users) shows on camera — add an undo prep step.
+- Leftover state from earlier takes (already-sent items, claimed tasks, busy users) shows on camera — add a reset prep step.
 
 ## Report
 
