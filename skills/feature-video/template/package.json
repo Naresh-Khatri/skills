@@ -1,0 +1,32 @@
+{
+  "name": "feature-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "new": "node scripts/new.ts",
+    "films": "node scripts/films.ts",
+    "studio": "node scripts/films.ts && remotion studio src/index.ts",
+    "voice": "node scripts/voice.ts",
+    "prep": "node scripts/prep.ts",
+    "record:web": "node scripts/record-web.ts",
+    "record:android": "node scripts/record-android.ts",
+    "render": "node scripts/render.ts",
+    "typecheck": "node scripts/films.ts && tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.539",
+    "@remotion/google-fonts": "4.0.539",
+    "@remotion/media": "4.0.539",
+    "@remotion/transitions": "4.0.539",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.539"
+  },
+  "devDependencies": {
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "playwright": "^1.64.1",
+    "sherpa-onnx-node": "1.13.6",
+    "typescript": "6.0.3"
+  }
+}

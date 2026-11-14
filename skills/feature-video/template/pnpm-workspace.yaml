@@ -1,0 +1,5 @@
+# own workspace root -> installs standalone even inside a monorepo
+packages: []
+allowBuilds:
+  esbuild: true
+  sherpa-onnx-node: true
